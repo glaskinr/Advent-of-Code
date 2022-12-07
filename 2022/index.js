@@ -184,4 +184,52 @@ const day6 = () => {
     solve(input, 1);
     solve(input, 2);
 }
-day6()
+
+const day7 = () => {
+    const input = readFile('./inputs/day7.txt');
+
+    function solve(input) {
+        const sizes = { '/': 0 };
+        const paths = ['/'];
+        const lines = input.split('\n');
+        for (let i = 1; i < lines.length; i++) {
+            const [, cmd, dir] = lines[i].split(' ');
+            if (cmd === 'ls') {
+                for (i++; i < lines.length; i++) {
+                    const parts = lines[i].split(' ');
+                    if (parts[0] === '$') {
+                        i--;
+                        break;
+                    }
+                    if (parts[0] !== 'dir') {
+                        for (const path of paths) {
+                            sizes[path] = (sizes[path] ?? 0) + +parts[0];
+                        }
+                    }
+                }
+            } else {
+                if (dir === '..') {
+                    paths.pop();
+                } else {
+                    paths.push(`${paths.slice(-1)}${dir}/`);
+                }
+            }
+        }
+
+        console.log("Part 1: ",
+            Object.values(sizes)
+                .filter((size) => size <= 100000)
+                .reduce((acc, size) => acc + size)
+        );
+
+        console.log("Part 2: ",
+            Math.min(
+                ...Object.values(sizes).filter((size) => size >= sizes['/'] - 40000000)
+            )
+        );
+    }
+    solve(input);
+
+}
+
+day7()
